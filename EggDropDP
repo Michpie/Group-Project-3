@@ -1,59 +1,39 @@
 import java.util.*;
 
-public class EggDropDP {
-
-    public int eggDrop(int eggs, int floors) {
-        // dp[i][j] will hold the minimum number of trials for i eggs and j floors
-        int[][] dp = new int[eggs + 1][floors + 1];
-
-        // Base cases:
-        // 1. If we have 0 floors, no trials are needed.
-        // 2. If we have 1 floor, we only need 1 trial.
-        for (int i = 1; i <= eggs; i++) {
-            dp[i][0] = 0;
-            dp[i][1] = 1;
-        }
-
-        for (int j = 1; j <= floors; j++) {
-            dp[1][j] = j;
-        }
-
-        for (int i = 2; i <= eggs; i++) {
-            for (int j = 2; j <= floors; j++) { 
-                dp[i][j] = Integer.MAX_VALUE;
-
-                for (int x = 1; x <= j; x++) {
-                    int breaks = dp[i - 1][x - 1];
-                    int doesNotBreak = dp[i][j - x];
-
-                    int worst = Math.max(breaks, doesNotBreak) + 1;
-                    dp[i][j] = Math.min(dp[i][j], worst);
-                }
+public class Main {
+    public int superEggDrop(int eggs, int floors) {
+        int[] dp = new int[eggs + 1];
+        int moves = 0;
+        // Iterate until we can check all floors.
+        while (dp[eggs] < floors) {
+            moves++;
+            for (int k = eggs; k > 0; k--) {
+                dp[k] = dp[k] + dp[k - 1] + 1;
             }
         }
-
-        return dp[eggs][floors];
+        return moves;
     }
-
     public void runTestCases() {
         int[] floors = {500, 600, 700, 800, 900, 1000};
         int eggs = 3;
-
         for (int n : floors) {
-            long startTime = System.nanoTime();
-            int result = eggDrop(eggs, n);
-            long endTime = System.nanoTime();
-            long timeTaken = endTime - startTime;
-
+            long totalTime = 0;
+            // Run the function 10 times and accumulate the total time taken
+            for (int i = 0; i < 10; i++) {
+                long startTime = System.nanoTime();
+                superEggDrop(eggs, n);
+                long endTime = System.nanoTime();
+                totalTime += (endTime - startTime);
+            }
+            // Calculate the average time taken
+            long averageTime = totalTime / 10;
             System.out.println("Floors: " + n + ", Eggs: " + eggs);
-            System.out.println("Minimum number of trials: " + result);
-            System.out.println("Time taken (nanoseconds): " + timeTaken);
+            System.out.println("Average time taken (nanoseconds): " + averageTime);
             System.out.println("-----------------------------");
         }
     }
-
     public static void main(String[] args) {
-        EggDropDP solution = new EggDropDP();
+        Main solution = new Main();
         solution.runTestCases();
     }
 }
